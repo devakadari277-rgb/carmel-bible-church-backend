@@ -17,57 +17,14 @@ from .forms import (
 # PUBLIC / MEMBER VIEWS
 # ==========================================
 
+import os
+
 def home_view(request):
     """
-    Renders the church website Home Page with Welcome message, Pastor Profile,
-    Vision/Mission, Latest Events, Pinned & Approved Prayers, and Live Stream.
-    Includes the contact form submission handler inline.
+    Redirects to the React frontend website in development/production.
     """
-    settings = ChurchSetting.get_settings()
-    
-    # Get active live stream
-    live_stream = LiveStream.objects.filter(is_active=True).order_by('-created_at').first()
-    
-    # Get latest 3 events (future events preferred)
-    events = Event.objects.filter(event_date__gte=timezone.now()).order_by('event_date')[:3]
-    if not events.exists():
-        events = Event.objects.order_by('-event_date')[:3]
-        
-    # Get latest 3 announcements
-    announcements = Announcement.objects.order_by('-created_at')[:3]
-    
-    # Get pinned and approved prayer requests
-    pinned_prayers = PrayerRequest.objects.filter(status='approved', is_pinned=True).order_by('-created_at')
-    recent_prayers = PrayerRequest.objects.filter(status='approved', is_pinned=False).order_by('-created_at')[:4]
-    
-    # Contact Form Handler
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        subject = request.POST.get('subject')
-        message_text = request.POST.get('message')
-        
-        if name and email and subject and message_text:
-            ContactMessage.objects.create(
-                name=name,
-                email=email,
-                subject=subject,
-                message=message_text
-            )
-            messages.success(request, "Your contact message has been sent successfully. We will get back to you shortly.")
-            return redirect('home')
-        else:
-            messages.error(request, "Please fill out all fields in the contact form.")
-            
-    context = {
-        'church_settings': settings,
-        'live_stream': live_stream,
-        'events': events,
-        'announcements': announcements,
-        'pinned_prayers': pinned_prayers,
-        'recent_prayers': recent_prayers,
-    }
-    return render(request, 'church/home.html', context)
+    frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+    return redirect(frontend_url)
 
 def register_view(request):
     """
