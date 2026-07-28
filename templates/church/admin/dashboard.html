@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    {% include "church/admin/sidebar.html" %}
+    
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+            <div>
+                <h2 class="text-white mb-1">Dashboard Overview</h2>
+                <p class="text-secondary mb-0">Statistics and overview of Carmel Bible Church database.</p>
+            </div>
+            <div class="badge bg-secondary p-2.5">
+                <i class="bi bi-clock me-1"></i>{% now "l, F d, Y" %}
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="row g-4 mb-5">
+            <div class="col-xl-3 col-sm-6">
+                <div class="stats-card">
+                    <div>
+                        <span class="text-secondary small fw-semibold text-uppercase">Total Members</span>
+                        <h3 class="text-white mt-1 mb-0">{{ total_members }}</h3>
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-sm-6">
+                <div class="stats-card">
+                    <div>
+                        <span class="text-secondary small fw-semibold text-uppercase">Prayers Queue</span>
+                        <h3 class="text-white mt-1 mb-0">{{ total_prayers }}</h3>
+                        {% if pending_prayers > 0 %}
+                            <span class="badge bg-danger mt-1">{{ pending_prayers }} Pending</span>
+                        {% endif %}
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-chat-heart-fill"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-sm-6">
+                <div class="stats-card">
+                    <div>
+                        <span class="text-secondary small fw-semibold text-uppercase">Total Events</span>
+                        <h3 class="text-white mt-1 mb-0">{{ total_events }}</h3>
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-calendar-event-fill"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-sm-6">
+                <div class="stats-card">
+                    <div>
+                        <span class="text-secondary small fw-semibold text-uppercase">Inbox Messages</span>
+                        <h3 class="text-white mt-1 mb-0">{{ total_messages }}</h3>
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-envelope-open-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Welcome card -->
+        <div class="glass-card p-4 p-md-5 mb-5">
+            <div class="row align-items-center g-4">
+                <div class="col-md-8">
+                    <h3 class="text-white mb-2">Welcome to your Admin Dashboard</h3>
+                    <p class="text-secondary leading-relaxed mb-0">
+                        From here you can manage all aspects of the Carmel Bible Church online profile. Upload events, edit pastor information, moderate and approve prayer requests, update website links, customize layouts, and view member directories. Use the sidebar navigation on the left to start editing.
+                    </p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="bi bi-shield-check text-warning display-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

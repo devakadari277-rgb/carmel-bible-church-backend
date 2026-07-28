@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="glass-card p-4 p-md-5">
+                <div class="d-flex flex-sm-row flex-column align-items-center gap-4 mb-5 pb-4 border-bottom border-secondary border-opacity-25">
+                    <div class="position-relative">
+                        {% if request.user.profile.profile_photo %}
+                            <img src="{{ request.user.profile.profile_photo.url }}" class="rounded-circle border border-warning border-3 shadow-lg" style="width: 120px; height: 120px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" style="width: 120px; height: 120px;">
+                                <i class="bi bi-person fs-1"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-sm-start text-center">
+                        <h2 class="mb-1">{{ request.user.username }}</h2>
+                        <p class="text-warning mb-2 font-weight-bold">
+                            Role: <span class="badge bg-{% if request.user.role == 'admin' %}danger{% else %}info{% endif %}">{{ request.user.role|title }}</span>
+                        </p>
+                        <p class="text-secondary small mb-0"><i class="bi bi-calendar-check me-1"></i>Joined on {{ request.user.date_joined|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <h4 class="mb-4 text-warning"><i class="bi bi-person-gear me-2"></i>Account Information</h4>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            {{ u_form.first_name }}
+                            {% if u_form.first_name.errors %}
+                                <div class="text-danger small mt-1">{% for error in u_form.first_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            {{ u_form.last_name }}
+                            {% if u_form.last_name.errors %}
+                                <div class="text-danger small mt-1">{% for error in u_form.last_name.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4 border-bottom border-secondary border-opacity-25 pb-4">
+                        <div class="col-md-12">
+                            <label for="id_email" class="form-label">Email Address</label>
+                            {{ u_form.email }}
+                            {% if u_form.email.errors %}
+                                <div class="text-danger small mt-1">{% for error in u_form.email.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h4 class="mb-4 text-warning"><i class="bi bi-card-list me-2"></i>Profile details</h4>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_phone_number" class="form-label">Phone Number</label>
+                            {{ p_form.phone_number }}
+                            {% if p_form.phone_number.errors %}
+                                <div class="text-danger small mt-1">{% for error in p_form.phone_number.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_profile_photo" class="form-label">Profile Photo</label>
+                            {{ p_form.profile_photo }}
+                            {% if p_form.profile_photo.errors %}
+                                <div class="text-danger small mt-1">{% for error in p_form.profile_photo.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12 mb-3">
+                            <label for="id_address" class="form-label">Physical Address</label>
+                            {{ p_form.address }}
+                            {% if p_form.address.errors %}
+                                <div class="text-danger small mt-1">{% for error in p_form.address.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-5">
+                        <div class="col-md-12">
+                            <label for="id_bio" class="form-label">Short Biography</label>
+                            {{ p_form.bio }}
+                            {% if p_form.bio.errors %}
+                                <div class="text-danger small mt-1">{% for error in p_form.bio.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-3">
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-accent px-5">
+                            <i class="bi bi-save me-2"></i>Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

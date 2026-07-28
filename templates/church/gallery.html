@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="text-center mb-5">
+        <span class="text-warning fw-bold text-uppercase small">Visual Testimony</span>
+        <h2 class="display-5 text-white mt-1">Photo Gallery</h2>
+        <p class="text-secondary max-width-600 mx-auto">
+            Glimpses of our church life, worship gatherings, ministries, and community services.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        {% for photo in photos %}
+            <div class="col-lg-4 col-md-6">
+                <div class="gallery-item glass-card" data-bs-toggle="modal" data-bs-target="#imageModal{{ photo.id }}">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.caption }}">
+                    {% if photo.caption %}
+                        <div class="gallery-caption">
+                            <h5 class="mb-0 font-weight-bold">{{ photo.caption }}</h5>
+                            <p class="mb-0 small text-secondary">Uploaded on {{ photo.uploaded_at|date:"M d, Y" }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Modal for Lightbox effect -->
+            <div class="modal fade" id="imageModal{{ photo.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content bg-dark border-0 glass-card">
+                        <div class="modal-header border-0 pb-0">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center p-4 pt-0">
+                            <img src="{{ photo.image.url }}" class="img-fluid rounded mb-3" style="max-height: 70vh; object-fit: contain;">
+                            {% if photo.caption %}
+                                <h4 class="text-white mb-1">{{ photo.caption }}</h4>
+                            {% endif %}
+                            <p class="text-secondary mb-0 small">Uploaded on {{ photo.uploaded_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="glass-card p-5 max-width-600 mx-auto">
+                    <i class="bi bi-images text-secondary display-3 mb-3"></i>
+                    <h5 class="text-white">No images uploaded yet</h5>
+                    <p class="text-secondary mb-0">Check back later to see photos from our recent services and events.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

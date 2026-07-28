@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Manage Gallery{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    {% include "church/admin/sidebar.html" %}
+    
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+            <div>
+                <h2 class="text-white mb-1">Manage Gallery</h2>
+                <p class="text-secondary mb-0">Upload new photos and moderate the public photo gallery.</p>
+            </div>
+            <div class="badge bg-secondary p-2.5">
+                Total Photos: {{ photos.count }}
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Upload Panel -->
+            <div class="col-lg-4">
+                <div class="glass-card p-4">
+                    <h4 class="text-white mb-4"><i class="bi bi-cloud-arrow-up text-warning me-2"></i>Upload Photo</h4>
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="create">
+                        
+                        <div class="mb-3">
+                            <label for="id_image" class="form-label">Select Photo</label>
+                            {{ form.image }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_caption" class="form-label">Caption / Description</label>
+                            {{ form.caption }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-accent w-100 py-2.5">
+                            <i class="bi bi-plus-circle me-2"></i>Upload to Gallery
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Gallery Grid Panel -->
+            <div class="col-lg-8">
+                <div class="glass-card p-4">
+                    <h4 class="text-white mb-4"><i class="bi bi-images text-warning me-2"></i>Gallery Assets</h4>
+                    
+                    <div class="row g-3">
+                        {% for photo in photos %}
+                            <div class="col-sm-6 col-md-4">
+                                <div class="glass-card h-100 position-relative group">
+                                    <img src="{{ photo.image.url }}" class="img-fluid rounded-top" style="height: 140px; width: 100%; object-fit: cover;">
+                                    <div class="p-2.5">
+                                        <p class="small text-white mb-1 text-truncate" title="{{ photo.caption }}">{{ photo.caption|default:"No caption" }}</p>
+                                        <p class="text-secondary small mb-0">{{ photo.uploaded_at|date:"M d, Y" }}</p>
+                                    </div>
+                                    
+                                    <!-- Delete Trigger Button Overlay -->
+                                    <div class="position-absolute top-0 end-0 m-2">
+                                        <button class="btn btn-danger btn-sm p-1 rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;" data-bs-toggle="modal" data-bs-target="#deletePhotoModal{{ photo.id }}">
+                                            <i class="bi bi-trash fs-6"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="deletePhotoModal{{ photo.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content bg-dark border-0 glass-card text-start">
+                                                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                                                    <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-4">
+                                                    <p class="mb-0">Are you sure you want to permanently delete this photo from the gallery? This action is immediate and cannot be undone.</p>
+                                                    <div class="text-center mt-3">
+                                                        <img src="{{ photo.image.url }}" class="rounded shadow" style="max-height: 100px; object-fit: cover;">
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-top border-secondary border-opacity-25 pt-3">
+                                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <form method="POST" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="photo_id" value="{{ photo.id }}">
+                                                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12 text-center py-5 text-secondary">
+                                <i class="bi bi-images display-4 d-block mb-3"></i>
+                                No photos uploaded in the gallery yet.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

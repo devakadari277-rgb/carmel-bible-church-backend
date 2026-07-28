@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Prayer Requests{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row g-4 justify-content-between mb-5">
+        <div class="col-lg-7">
+            <span class="text-warning fw-bold text-uppercase small">Online Prayer Wall</span>
+            <h2 class="display-5 mb-3 text-white">Prayer Requests</h2>
+            <p class="text-secondary leading-relaxed">
+                "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God." — Philippians 4:6
+            </p>
+            <p class="text-secondary">
+                Submit your petitions to the church family. Every request goes to the church administration for review and approval to maintain a respectful and focused fellowship space. Once approved, the prayer requests will display on this public page so other members can join you in prayer.
+            </p>
+        </div>
+        
+        <div class="col-lg-5">
+            <div class="glass-card p-4">
+                {% if request.user.is_authenticated %}
+                    <h4 class="text-white mb-3"><i class="bi bi-plus-circle text-warning me-2"></i>Submit Request</h4>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_title" class="form-label">Title / Focus</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.title.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label">Prayer Petition</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-1">{% for error in form.description.errors %}{{ error }}{% endfor %}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-4 d-flex align-items-center gap-2">
+                            {{ form.is_anonymous }}
+                            <label class="form-check-label text-secondary small" for="id_is_anonymous">
+                                Submit anonymously (hides your username on the wall)
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-accent w-100 py-2.5">
+                            <i class="bi bi-send-fill me-2"></i>Submit to Administrator
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-person-lock text-warning display-4 mb-3"></i>
+                        <h4 class="text-white mb-2">Member Action Required</h4>
+                        <p class="text-secondary small mb-4">You must be registered and logged in to submit a prayer request.</p>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'login' %}" class="btn btn-accent">Log In to Submit</a>
+                            <a href="{% url 'register' %}" class="btn btn-outline-custom">Register Account</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Active prayer requests wall -->
+    <div class="border-top border-secondary border-opacity-25 pt-5">
+        <h3 class="mb-4 text-white"><i class="bi bi-chat-heart text-warning me-2"></i>Active Prayer Points</h3>
+        
+        <div class="row g-4">
+            <!-- Pinned requests display first -->
+            {% for prayer in pinned_prayers %}
+                <div class="col-lg-6">
+                    <div class="glass-card p-4 h-100 border-warning border-opacity-50">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge-pinned"><i class="bi bi-pin-angle-fill"></i> PINNED REQUEST</span>
+                            <span class="text-secondary small">{{ prayer.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <h4 class="text-white mb-3">{{ prayer.title }}</h4>
+                        <p class="text-secondary mb-4">{{ prayer.description }}</p>
+                        <div class="d-flex align-items-center gap-2 mt-auto">
+                            <i class="bi bi-person-fill text-warning"></i>
+                            <span class="small fw-semibold text-secondary">
+                                {% if prayer.is_anonymous %}Anonymous Member{% else %}{{ prayer.user.username }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            {% for prayer in recent_prayers %}
+                <div class="col-lg-6">
+                    <div class="glass-card p-4 h-100">
+                        <div class="d-flex justify-content-end mb-3">
+                            <span class="text-secondary small">{{ prayer.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <h4 class="text-white mb-3">{{ prayer.title }}</h4>
+                        <p class="text-secondary mb-4">{{ prayer.description }}</p>
+                        <div class="d-flex align-items-center gap-2 mt-auto">
+                            <i class="bi bi-person-fill text-warning"></i>
+                            <span class="small fw-semibold text-secondary">
+                                {% if prayer.is_anonymous %}Anonymous Member{% else %}{{ prayer.user.username }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                {% if not pinned_prayers %}
+                    <div class="col-12 text-center py-5">
+                        <div class="glass-card p-5 max-width-600 mx-auto">
+                            <i class="bi bi-heart text-secondary display-3 mb-3"></i>
+                            <h5 class="text-white">The prayer wall is currently clear</h5>
+                            <p class="text-secondary mb-0">Join us in submitting your requests or checking back later.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

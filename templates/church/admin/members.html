@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Manage Members{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    {% include "church/admin/sidebar.html" %}
+    
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+            <div>
+                <h2 class="text-white mb-1">Manage Members</h2>
+                <p class="text-secondary mb-0">List of registered church members. Admins can moderate accounts.</p>
+            </div>
+            <div class="badge bg-secondary p-2.5">
+                Total Members: {{ members.count }}
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                    <thead>
+                        <tr class="border-secondary">
+                            <th scope="col" class="px-4 py-3 text-warning">User Details</th>
+                            <th scope="col" class="py-3 text-warning">Email Address</th>
+                            <th scope="col" class="py-3 text-warning">Status</th>
+                            <th scope="col" class="py-3 text-warning">Date Joined</th>
+                            <th scope="col" class="px-4 py-3 text-end text-warning">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members %}
+                            <tr class="border-secondary">
+                                <td class="px-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        {% if member.profile.profile_photo %}
+                                            <img src="{{ member.profile.profile_photo.url }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <div class="fw-bold text-white">{{ member.username }}</div>
+                                            <div class="text-secondary small">Name: {{ member.first_name }} {{ member.last_name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 text-white">{{ member.email }}</td>
+                                <td class="py-3">
+                                    <span class="badge bg-info">Member</span>
+                                </td>
+                                <td class="py-3 text-secondary small">{{ member.date_joined|date:"M d, Y P" }}</td>
+                                <td class="px-4 py-3 text-end">
+                                    <!-- Delete confirmation trigger modal -->
+                                    <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ member.id }}">
+                                        <i class="bi bi-trash me-1"></i>Delete Account
+                                    </button>
+                                    
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="deleteModal{{ member.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content bg-dark border-0 glass-card text-start">
+                                                <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                                                    <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-4">
+                                                    <p class="mb-0">Are you sure you want to permanently delete user account <strong>{{ member.username }}</strong>? This action will remove all profile details and cannot be undone.</p>
+                                                </div>
+                                                <div class="modal-footer border-top border-secondary border-opacity-25 pt-3">
+                                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <form method="POST" class="d-inline">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="user_id" value="{{ member.id }}">
+                                                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-secondary">
+                                    <i class="bi bi-people display-4 d-block mb-3"></i>
+                                    No members registered in the database yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Manage Announcements{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    {% include "church/admin/sidebar.html" %}
+    
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+            <div>
+                <h2 class="text-white mb-1">{% if edit_announcement %}Edit Announcement{% else %}Create / Manage Announcements{% endif %}</h2>
+                <p class="text-secondary mb-0">Publish bulletins, updates, and general information to the member wall.</p>
+            </div>
+            <div class="badge bg-secondary p-2.5">
+                Total Announcements: {{ announcements.count }}
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Form Panel -->
+            <div class="col-lg-4">
+                <div class="glass-card p-4">
+                    <h4 class="text-white mb-4">
+                        {% if edit_announcement %}
+                            <i class="bi bi-pencil-square text-warning me-2"></i>Update Notice
+                        {% else %}
+                            <i class="bi bi-megaphone-fill text-warning me-2"></i>Add Announcement
+                        {% endif %}
+                    </h4>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% if edit_announcement %}
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="announcement_id" value="{{ edit_announcement.id }}">
+                        {% else %}
+                            <input type="hidden" name="action" value="create">
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="id_title" class="form-label">Title</label>
+                            {{ form.title }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_content" class="form-label">Announcement Content</label>
+                            {{ form.content }}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            {% if edit_announcement %}
+                                <a href="{% url 'admin_announcements' %}" class="btn btn-outline-secondary flex-grow-1">Cancel</a>
+                                <button type="submit" class="btn btn-accent flex-grow-1">Update</button>
+                            {% else %}
+                                <button type="submit" class="btn btn-accent w-100">Publish Announcement</button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- List Panel -->
+            <div class="col-lg-8">
+                <div class="glass-card p-4">
+                    <h4 class="text-white mb-4"><i class="bi bi-list-task text-warning me-2"></i>Published Bulletins</h4>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                            <thead>
+                                <tr class="border-secondary">
+                                    <th scope="col" class="py-3 text-warning">Announcement Details</th>
+                                    <th scope="col" class="py-3 text-warning">Published Date</th>
+                                    <th scope="col" class="px-4 py-3 text-end text-warning">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for announcement in announcements %}
+                                    <tr class="border-secondary">
+                                        <td class="py-3">
+                                            <div class="fw-bold text-white mb-1">{{ announcement.title }}</div>
+                                            <p class="text-secondary small mb-0 pe-4" style="max-width: 380px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ announcement.content }}</p>
+                                        </td>
+                                        <td class="py-3 text-secondary small">{{ announcement.created_at|date:"M d, Y P" }}</td>
+                                        <td class="px-4 py-3 text-end">
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <a href="{% url 'admin_announcements' %}?edit={{ announcement.id }}" class="btn btn-outline-warning btn-sm" title="Edit Announcement">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                
+                                                <!-- Delete button -->
+                                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAnnModal{{ announcement.id }}" title="Delete Announcement">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                                
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="deleteAnnModal{{ announcement.id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content bg-dark border-0 glass-card text-start">
+                                                            <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                                                                <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body py-4">
+                                                                <p class="mb-0">Are you sure you want to permanently delete announcement <strong>"{{ announcement.title }}"</strong>? This cannot be undone.</p>
+                                                            </div>
+                                                            <div class="modal-footer border-top border-secondary border-opacity-25 pt-3">
+                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                <form method="POST" class="d-inline">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="action" value="delete">
+                                                                    <input type="hidden" name="announcement_id" value="{{ announcement.id }}">
+                                                                    <button type="submit" class="btn btn-danger">Confrim Delete</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-5 text-secondary">
+                                            <i class="bi bi-megaphone display-4 d-block mb-3"></i>
+                                            No announcements published yet.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

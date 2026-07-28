@@ -1,0 +1,12 @@
+Django>=5.0,<6.1
+django-cors-headers
+djangorestframework
+djangorestframework-simplejwt
+pillow
+pyngrok
+twilio
+openpyxl
+gunicorn
+whitenoise
+dj-database-url
+psycopg2-binary

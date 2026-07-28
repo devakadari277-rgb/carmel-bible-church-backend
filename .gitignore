@@ -1,0 +1,17 @@
+# Django
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+*.log
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Frontend (if they keep it, but it's already in its own repo)
+frontend/

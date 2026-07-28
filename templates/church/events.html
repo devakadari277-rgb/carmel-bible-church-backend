@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Events{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="text-center mb-5">
+        <span class="text-warning fw-bold text-uppercase small">Fellowship & Gathering</span>
+        <h2 class="display-5 text-white mt-1">Church Events</h2>
+        <p class="text-secondary max-width-600 mx-auto">
+            Stay connected with the church community through our services, gatherings, and special outreach events.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        {% for event in events %}
+            <div class="col-lg-4 col-md-6">
+                <div class="glass-card h-100 d-flex flex-column">
+                    {% if event.event_image %}
+                        <img src="{{ event.event_image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 220px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 220px; opacity: 0.85;">
+                            <i class="bi bi-calendar-event display-3"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body p-4 d-flex flex-column flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-warning text-dark fw-bold">{{ event.event_date|date:"M d, Y" }}</span>
+                            <span class="badge bg-secondary">{{ event.event_date|date:"P" }}</span>
+                        </div>
+                        <h3 class="card-title text-white mb-2 fs-4">{{ event.title }}</h3>
+                        <p class="card-text text-secondary small flex-grow-1">{{ event.description|linebreaksbr }}</p>
+                        <hr class="border-secondary opacity-25 mt-4">
+                        <p class="mb-0 small text-secondary"><i class="bi bi-geo-alt-fill text-warning me-1"></i>{{ event.location }}</p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="glass-card p-5 max-width-600 mx-auto">
+                    <i class="bi bi-calendar-x text-secondary display-3 mb-3"></i>
+                    <h5 class="text-white">No scheduled events</h5>
+                    <p class="text-secondary mb-0">Check back later or check our announcements for upcoming gatherings.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

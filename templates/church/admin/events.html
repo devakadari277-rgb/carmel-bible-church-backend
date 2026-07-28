@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Manage Events{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    {% include "church/admin/sidebar.html" %}
+    
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+            <div>
+                <h2 class="text-white mb-1">{% if edit_event %}Edit Event{% else %}Create / Manage Events{% endif %}</h2>
+                <p class="text-secondary mb-0">Publish church services, Bible study classes, and community fellowships.</p>
+            </div>
+            <div class="badge bg-secondary p-2.5">
+                Total Events: {{ events.count }}
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Event Form Panel -->
+            <div class="col-lg-4">
+                <div class="glass-card p-4">
+                    <h4 class="text-white mb-4">
+                        {% if edit_event %}
+                            <i class="bi bi-pencil-square text-warning me-2"></i>Update Event
+                        {% else %}
+                            <i class="bi bi-calendar-plus text-warning me-2"></i>Add New Event
+                        {% endif %}
+                    </h4>
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% if edit_event %}
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="event_id" value="{{ edit_event.id }}">
+                        {% else %}
+                            <input type="hidden" name="action" value="create">
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="id_title" class="form-label">Event Title</label>
+                            {{ form.title }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_event_date" class="form-label">Event Date & Time</label>
+                            <!-- Force standard inputs or formatting -->
+                            {% if edit_event %}
+                                <input type="datetime-local" name="event_date" class="form-control" id="id_event_date" required value="{{ edit_event.event_date|date:'Y-m-d\TH:i' }}">
+                            {% else %}
+                                {{ form.event_date }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_location" class="form-label">Location / Platform</label>
+                            {{ form.location }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_event_image" class="form-label">Event Banner Image</label>
+                            {{ form.event_image }}
+                            {% if edit_event.event_image %}
+                                <div class="mt-2">
+                                    <span class="small text-secondary d-block">Current Image:</span>
+                                    <img src="{{ edit_event.event_image.url }}" class="rounded mt-1" style="max-height: 80px; object-fit: cover;">
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            {% if edit_event %}
+                                <a href="{% url 'admin_events' %}" class="btn btn-outline-secondary flex-grow-1">Cancel</a>
+                                <button type="submit" class="btn btn-accent flex-grow-1">Update</button>
+                            {% else %}
+                                <button type="submit" class="btn btn-accent w-100">Publish Event</button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Events List Panel -->
+            <div class="col-lg-8">
+                <div class="glass-card p-4">
+                    <h4 class="text-white mb-4"><i class="bi bi-list-stars text-warning me-2"></i>Published Events</h4>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                            <thead>
+                                <tr class="border-secondary">
+                                    <th scope="col" class="py-3 text-warning">Event Info</th>
+                                    <th scope="col" class="py-3 text-warning">Date & Time</th>
+                                    <th scope="col" class="py-3 text-warning">Location</th>
+                                    <th scope="col" class="px-4 py-3 text-end text-warning">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in events %}
+                                    <tr class="border-secondary">
+                                        <td class="py-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                {% if event.event_image %}
+                                                    <img src="{{ event.event_image.url }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="rounded bg-secondary d-flex align-items-center justify-content-center text-white" style="width: 50px; height: 50px;">
+                                                        <i class="bi bi-calendar-event"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <div class="fw-bold text-white">{{ event.title }}</div>
+                                                    <div class="text-secondary small" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ event.description }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 text-white small">
+                                            <div>{{ event.event_date|date:"M d, Y" }}</div>
+                                            <div class="text-secondary">{{ event.event_date|date:"P" }}</div>
+                                        </td>
+                                        <td class="py-3 text-secondary small">{{ event.location }}</td>
+                                        <td class="px-4 py-3 text-end">
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <a href="{% url 'admin_events' %}?edit={{ event.id }}" class="btn btn-outline-warning btn-sm" title="Edit Event">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                
+                                                <!-- Delete button and modal trigger -->
+                                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteEventModal{{ event.id }}" title="Delete Event">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                                
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="deleteEventModal{{ event.id }}" tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content bg-dark border-0 glass-card text-start">
+                                                            <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                                                                <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body py-4">
+                                                                <p class="mb-0">Are you sure you want to permanently delete event <strong>"{{ event.title }}"</strong>? This cannot be undone.</p>
+                                                            </div>
+                                                            <div class="modal-footer border-top border-secondary border-opacity-25 pt-3">
+                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                <form method="POST" class="d-inline">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="action" value="delete">
+                                                                    <input type="hidden" name="event_id" value="{{ event.id }}">
+                                                                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5 text-secondary">
+                                            <i class="bi bi-calendar-x display-4 d-block mb-3"></i>
+                                            No events created yet.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

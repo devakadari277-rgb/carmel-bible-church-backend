@@ -1,0 +1,60 @@
+<div class="admin-sidebar shadow-lg">
+    <div class="text-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+        <h5 class="text-warning mb-1"><i class="bi bi-shield-check me-2"></i>Admin Panel</h5>
+        <span class="text-secondary small">{{ request.user.username }}</span>
+    </div>
+    
+    <ul class="sidebar-nav">
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">
+                <i class="bi bi-speedometer2"></i>Overview
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_members' %}active{% endif %}" href="{% url 'admin_members' %}">
+                <i class="bi bi-people"></i>Manage Members
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_prayers' %}active{% endif %}" href="{% url 'admin_prayers' %}">
+                <i class="bi bi-chat-heart"></i>Prayers Queue
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_events' %}active{% endif %}" href="{% url 'admin_events' %}">
+                <i class="bi bi-calendar-event"></i>Manage Events
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_streams' %}active{% endif %}" href="{% url 'admin_streams' %}">
+                <i class="bi bi-broadcast"></i>Live Streams
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_gallery' %}active{% endif %}" href="{% url 'admin_gallery' %}">
+                <i class="bi bi-images"></i>Gallery
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_announcements' %}active{% endif %}" href="{% url 'admin_announcements' %}">
+                <i class="bi bi-megaphone"></i>Announcements
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_church_info' %}active{% endif %}" href="{% url 'admin_church_info' %}">
+                <i class="bi bi-sliders2"></i>Website Customizer
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-link {% if request.resolver_match.url_name == 'admin_messages' %}active{% endif %}" href="{% url 'admin_messages' %}">
+                <i class="bi bi-envelope-open"></i>Inbox Messages
+            </a>
+        </li>
+    </ul>
+    
+    <div class="mt-5 pt-3 border-top border-secondary border-opacity-25 text-center">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm w-100">
+            <i class="bi bi-arrow-left me-1"></i>Back to Website
+        </a>
+    </div>
+</div>

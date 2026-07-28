@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Manage Prayers{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    {% include "church/admin/sidebar.html" %}
+    
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+            <div>
+                <h2 class="text-white mb-1">Prayers Moderation</h2>
+                <p class="text-secondary mb-0">Approve, reject, pin, or delete prayer requests submitted by members.</p>
+            </div>
+            <div class="badge bg-secondary p-2.5">
+                Total Requests: {{ prayers.count }}
+            </div>
+        </div>
+        
+        <div class="glass-card">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                    <thead>
+                        <tr class="border-secondary">
+                            <th scope="col" class="px-4 py-3 text-warning">Submitter Details</th>
+                            <th scope="col" class="py-3 text-warning">Prayer Request</th>
+                            <th scope="col" class="py-3 text-warning">Status</th>
+                            <th scope="col" class="py-3 text-warning">Submitted Date</th>
+                            <th scope="col" class="px-4 py-3 text-end text-warning">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prayer in prayers %}
+                            <tr class="border-secondary">
+                                <td class="px-4 py-3">
+                                    <div class="fw-bold text-white">{{ prayer.user.username }}</div>
+                                    <div class="text-secondary small">
+                                        {% if prayer.is_anonymous %}
+                                            <span class="badge bg-secondary"><i class="bi bi-eye-slash-fill me-1"></i>Anonymous requested</span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark"><i class="bi bi-eye-fill me-1"></i>Public display</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <div class="fw-bold text-white mb-1">
+                                        {% if prayer.is_pinned %}
+                                            <span class="badge bg-warning text-dark me-1"><i class="bi bi-pin-angle-fill"></i> Pinned</span>
+                                        {% endif %}
+                                        {{ prayer.title }}
+                                    </div>
+                                    <p class="text-secondary small mb-0 pe-5" style="max-width: 400px; overflow-wrap: break-word;">{{ prayer.description|truncatewords:25 }}</p>
+                                </td>
+                                <td class="py-3">
+                                    {% if prayer.status == 'approved' %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Approved</span>
+                                    {% elif prayer.status == 'rejected' %}
+                                        <span class="badge bg-danger"><i class="bi bi-x-circle-fill me-1"></i>Rejected</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-clock-fill me-1"></i>Pending Review</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-secondary small">{{ prayer.created_at|date:"M d, Y P" }}</td>
+                                <td class="px-4 py-3 text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        {% if prayer.status != 'approved' %}
+                                            <form method="POST" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="approve">
+                                                <input type="hidden" name="prayer_id" value="{{ prayer.id }}">
+                                                <button type="submit" class="btn btn-success btn-sm" title="Approve Request">
+                                                    <i class="bi bi-check-lg"></i> Approve
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        
+                                        {% if prayer.status != 'rejected' %}
+                                            <form method="POST" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="reject">
+                                                <input type="hidden" name="prayer_id" value="{{ prayer.id }}">
+                                                <button type="submit" class="btn btn-outline-warning btn-sm" title="Reject Request">
+                                                    <i class="bi bi-x-lg"></i> Reject
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        
+                                        {% if prayer.status == 'approved' %}
+                                            {% if prayer.is_pinned %}
+                                                <form method="POST" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="unpin">
+                                                    <input type="hidden" name="prayer_id" value="{{ prayer.id }}">
+                                                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Unpin Request">
+                                                        <i class="bi bi-pin-angle"></i> Unpin
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <form method="POST" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="pin">
+                                                    <input type="hidden" name="prayer_id" value="{{ prayer.id }}">
+                                                    <button type="submit" class="btn btn-outline-warning btn-sm" title="Pin Request">
+                                                        <i class="bi bi-pin-angle-fill"></i> Pin
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        <!-- Delete Trigger Button -->
+                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deletePrayerModal{{ prayer.id }}" title="Delete Request">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="deletePrayerModal{{ prayer.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content bg-dark border-0 glass-card text-start">
+                                                    <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+                                                        <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body py-4">
+                                                        <p class="mb-0">Are you sure you want to permanently delete the prayer request titled <strong>"{{ prayer.title }}"</strong>? This cannot be undone.</p>
+                                                    </div>
+                                                    <div class="modal-footer border-top border-secondary border-opacity-25 pt-3">
+                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <form method="POST" class="d-inline">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="action" value="delete">
+                                                            <input type="hidden" name="prayer_id" value="{{ prayer.id }}">
+                                                            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-secondary">
+                                    <i class="bi bi-chat-heart display-4 d-block mb-3"></i>
+                                    No prayer requests submitted yet.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

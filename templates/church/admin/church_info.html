@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Website Customizer{% endblock %}
+{% block content %}
+<div class="admin-container">
+    {% include "church/admin/sidebar.html" %}
+    
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary border-opacity-25 pb-3">
+            <div>
+                <h2 class="text-white mb-1">Website Settings & Info Customizer</h2>
+                <p class="text-secondary mb-0">Modify layouts, branding, pastor details, and contact coordinates in real time.</p>
+            </div>
+            <div class="badge bg-secondary p-2.5">
+                <i class="bi bi-gear-fill me-1"></i>System Config
+            </div>
+        </div>
+        
+        <div class="glass-card p-4 p-md-5">
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-pills mb-4 pb-3 border-bottom border-secondary border-opacity-25 gap-2" id="settingsTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="church-tab" data-bs-toggle="tab" data-bs-target="#church-pane" type="button" role="tab" aria-controls="church-pane" aria-selected="true">
+                        <i class="bi bi-bank me-1"></i>Church Info & Logo
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pastor-tab" data-bs-toggle="tab" data-bs-target="#pastor-pane" type="button" role="tab" aria-controls="pastor-pane" aria-selected="false">
+                        <i class="bi bi-person-workspace me-1"></i>Pastor Profile Details
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-pane" type="button" role="tab" aria-controls="contact-pane" aria-selected="false">
+                        <i class="bi bi-telephone me-1"></i>Contact Details & Map
+                    </button>
+                </li>
+            </ul>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="tab-content" id="settingsTabContent">
+                    
+                    <!-- Tab 1: Church Info -->
+                    <div class="tab-pane fade show active" id="church-pane" role="tabpanel" aria-labelledby="church-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_church_name" class="form-label">Church Name</label>
+                                {{ form.church_name }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_church_logo" class="form-label">Church Logo</label>
+                                {{ form.church_logo }}
+                                {% if settings.church_logo %}
+                                    <div class="mt-2">
+                                        <img src="{{ settings.church_logo.url }}" alt="logo preview" style="max-height: 50px;" class="rounded shadow bg-white p-1">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_hero_title" class="form-label">Hero Title (Home Banner)</label>
+                                {{ form.hero_title }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_hero_banner" class="form-label">Hero Banner Background Image</label>
+                                {{ form.hero_banner }}
+                                {% if settings.hero_banner %}
+                                    <div class="mt-2">
+                                        <img src="{{ settings.hero_banner.url }}" alt="banner preview" style="max-height: 50px;" class="rounded shadow">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_hero_subtitle" class="form-label">Hero Subtitle</label>
+                            {{ form.hero_subtitle }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_hero_subtitle_telugu" class="form-label">Hero Subtitle (Telugu)</label>
+                            {{ form.hero_subtitle_telugu }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_welcome_message" class="form-label">Welcome Message (Home Section)</label>
+                            {{ form.welcome_message }}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_vision" class="form-label">Our Vision</label>
+                                {{ form.vision }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_mission" class="form-label">Our Mission</label>
+                                {{ form.mission }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_vision_telugu" class="form-label">Our Vision (Telugu)</label>
+                                {{ form.vision_telugu }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_mission_telugu" class="form-label">Our Mission (Telugu)</label>
+                                {{ form.mission_telugu }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab 2: Pastor Profile Details -->
+                    <div class="tab-pane fade" id="pastor-pane" role="tabpanel" aria-labelledby="pastor-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_pastor_name" class="form-label">Pastor Name</label>
+                                {{ form.pastor_name }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_pastor_photo" class="form-label">Pastor Photo</label>
+                                {{ form.pastor_photo }}
+                                {% if settings.pastor_photo %}
+                                    <div class="mt-2">
+                                        <img src="{{ settings.pastor_photo.url }}" alt="pastor preview" style="max-height: 60px;" class="rounded shadow">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_pastor_designation" class="form-label">Pastor Designation / Title</label>
+                            {{ form.pastor_designation }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_pastor_welcome_message" class="form-label">Pastor Quote / Welcome Message Quote</label>
+                            {{ form.pastor_welcome_message }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_pastor_bio" class="form-label">Pastor Biography</label>
+                            {{ form.pastor_bio }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_pastor_ministry_info" class="form-label">Ministry Details</label>
+                            {{ form.pastor_ministry_info }}
+                        </div>
+                    </div>
+                    
+                    <!-- Tab 3: Contact & Map & Social Links -->
+                    <div class="tab-pane fade" id="contact-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_contact_phone" class="form-label">Contact Phone</label>
+                                {{ form.contact_phone }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_contact_email" class="form-label">Contact Email</label>
+                                {{ form.contact_email }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_contact_address" class="form-label">Physical Address</label>
+                            {{ form.contact_address }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_map_embed_url" class="form-label">Google Maps Embed URL (Iframe Src Only)</label>
+                            {{ form.map_embed_url }}
+                            <div class="text-secondary small mt-1">Provide the src attribute URL of the Google Maps embed iframe.</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_facebook_url" class="form-label">Facebook Page Link</label>
+                                {{ form.facebook_url }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_youtube_url" class="form-label">YouTube Channel Link</label>
+                                {{ form.youtube_url }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_instagram_url" class="form-label">Instagram Link</label>
+                                {{ form.instagram_url }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top border-secondary border-opacity-25">
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-accent px-5">
+                        <i class="bi bi-save2-fill me-2"></i>Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
