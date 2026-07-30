@@ -63,6 +63,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 class ChurchSettingSerializer(serializers.ModelSerializer):
+    church_logo = serializers.SerializerMethodField()
+    pastor_photo = serializers.SerializerMethodField()
+
     class Meta:
         model = ChurchSetting
         fields = '__all__'
@@ -88,6 +91,22 @@ class ChurchSettingSerializer(serializers.ModelSerializer):
             'instagram_url': {'allow_blank': True, 'required': False},
         }
 
+    def get_church_logo(self, obj):
+        if obj.church_logo:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.church_logo.url)
+            return obj.church_logo.url
+        return None
+
+    def get_pastor_photo(self, obj):
+        if obj.pastor_photo:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.pastor_photo.url)
+            return obj.pastor_photo.url
+        return None
+
 class PrayerRequestSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     user_id = serializers.IntegerField(source='user.id', read_only=True)
@@ -98,9 +117,19 @@ class PrayerRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user_id', 'username', 'created_at', 'updated_at']
 
 class EventSerializer(serializers.ModelSerializer):
+    event_image = serializers.SerializerMethodField()
+
     class Meta:
         model = Event
         fields = '__all__'
+
+    def get_event_image(self, obj):
+        if obj.event_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.event_image.url)
+            return obj.event_image.url
+        return None
 
 class AnnouncementSerializer(serializers.ModelSerializer):
     class Meta:
@@ -115,9 +144,19 @@ class LiveStreamSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'youtube_url', 'youtube_id', 'is_active', 'created_at']
 
 class GallerySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Gallery
         fields = '__all__'
+
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
 
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
