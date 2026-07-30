@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'corsheaders',  # CORS headers
     'rest_framework',  # DRF
     'rest_framework_simplejwt',  # JWT Auth
+    'cloudinary_storage',  # Cloudinary cloud media storage
+    'cloudinary',           # Cloudinary SDK
     'church.apps.ChurchConfig',  # Register our church application
 ]
 
@@ -184,3 +186,26 @@ TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '').strip()
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER', '').strip()
 
 
+# --- Cloudinary Cloud Media Storage ---
+# Stores all uploaded images (logos, pastor photos, gallery) permanently in the cloud.
+# Get free credentials from: https://cloudinary.com/
+import cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', ''),
+}
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME', ''),
+    api_key=os.getenv('CLOUDINARY_API_KEY', ''),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET', ''),
+)
+
+# Use Cloudinary for all uploaded media files if credentials are configured
+if os.getenv('CLOUDINARY_CLOUD_NAME'):
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = f"https://res.cloudinary.com/{os.getenv('CLOUDINARY_CLOUD_NAME')}/"
+else:
+    # Fallback to local media storage for local development
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
