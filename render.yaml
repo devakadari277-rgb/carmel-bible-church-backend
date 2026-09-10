@@ -1,8 +1,3 @@
-databases:
-  - name: carmel-db
-    databaseName: carmel_db
-    user: carmel_user
-
 services:
   - type: web
     name: carmel-backend
@@ -11,12 +6,14 @@ services:
     startCommand: "gunicorn carmel_project.wsgi:application"
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: carmel-db
-          property: connectionString
+        sync: false
       - key: SECRET_KEY
         generateValue: true
       - key: WEB_CONCURRENCY
         value: 4
       - key: PYTHON_VERSION
         value: 3.10.0
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
