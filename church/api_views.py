@@ -3,7 +3,7 @@ import os
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
-from rest_framework import viewsets, permissions, status, generics
+from rest_framework import viewsets, permissions, status, generics, parsers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -504,12 +504,14 @@ class GalleryViewSet(viewsets.ModelViewSet):
     queryset = Gallery.objects.all().order_by('-uploaded_at')
     serializer_class = GallerySerializer
     permission_classes = [IsAdminOrReadOnly]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
 
     def perform_create(self, serializer):
         photo = serializer.save()
+        caption_text = photo.caption or f"Photo #{photo.id}"
         ActivityLog.objects.create(
             user=self.request.user,
-            action=f"Uploaded new image to gallery: '{photo.caption}'"
+            action=f"Uploaded new image to gallery: '{caption_text}'"
         )
         # Generate user notifications for all registered members
         members = User.objects.filter(role='member')
@@ -517,11 +519,12 @@ class GalleryViewSet(viewsets.ModelViewSet):
             UserNotification.objects.create(
                 user=m,
                 title="New Photo Gallery Upload",
-                message=f"Admin added a new photo to the gallery: '{photo.caption}'."
+                message=f"Admin added a new photo to the gallery: '{caption_text}'."
             )
 
     def perform_destroy(self, instance):
-        action_msg = f"Deleted image from gallery: '{instance.caption}'"
+        caption_text = instance.caption or f"Photo #{instance.id}"
+        action_msg = f"Deleted image from gallery: '{caption_text}'"
         ActivityLog.objects.create(user=self.request.user, action=action_msg)
         instance.delete()
 

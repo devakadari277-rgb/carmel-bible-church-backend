@@ -63,13 +63,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 class ChurchSettingSerializer(serializers.ModelSerializer):
-    church_logo = serializers.SerializerMethodField()
-    pastor_photo = serializers.SerializerMethodField()
-
     class Meta:
         model = ChurchSetting
         fields = '__all__'
         extra_kwargs = {
+            'church_logo': {'required': False, 'allow_null': True},
+            'pastor_photo': {'required': False, 'allow_null': True},
             'hero_subtitle': {'allow_blank': True, 'required': False},
             'hero_subtitle_telugu': {'allow_blank': True, 'required': False},
             'welcome_message': {'allow_blank': True, 'required': False},
@@ -91,21 +90,20 @@ class ChurchSettingSerializer(serializers.ModelSerializer):
             'instagram_url': {'allow_blank': True, 'required': False},
         }
 
-    def get_church_logo(self, obj):
-        if obj.church_logo:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.church_logo.url)
-            return obj.church_logo.url
-        return None
-
-    def get_pastor_photo(self, obj):
-        if obj.pastor_photo:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.pastor_photo.url)
-            return obj.pastor_photo.url
-        return None
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get('request')
+        for f in ['church_logo', 'pastor_photo']:
+            val = getattr(instance, f, None)
+            if val:
+                try:
+                    url = val.url
+                    data[f] = request.build_absolute_uri(url) if request else url
+                except Exception:
+                    data[f] = None
+            else:
+                data[f] = None
+        return data
 
 class PrayerRequestSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
@@ -117,19 +115,26 @@ class PrayerRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user_id', 'username', 'created_at', 'updated_at']
 
 class EventSerializer(serializers.ModelSerializer):
-    event_image = serializers.SerializerMethodField()
-
     class Meta:
         model = Event
         fields = '__all__'
+        extra_kwargs = {
+            'event_image': {'required': False, 'allow_null': True},
+            'description': {'required': False, 'allow_blank': True},
+        }
 
-    def get_event_image(self, obj):
-        if obj.event_image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.event_image.url)
-            return obj.event_image.url
-        return None
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.event_image:
+            try:
+                url = instance.event_image.url
+                request = self.context.get('request')
+                data['event_image'] = request.build_absolute_uri(url) if request else url
+            except Exception:
+                data['event_image'] = None
+        else:
+            data['event_image'] = None
+        return data
 
 class AnnouncementSerializer(serializers.ModelSerializer):
     class Meta:
@@ -144,19 +149,26 @@ class LiveStreamSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'youtube_url', 'youtube_id', 'is_active', 'created_at']
 
 class GallerySerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
     class Meta:
         model = Gallery
         fields = '__all__'
+        extra_kwargs = {
+            'image': {'required': True},
+            'caption': {'required': False, 'allow_blank': True},
+        }
 
-    def get_image(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        return None
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.image:
+            try:
+                url = instance.image.url
+                request = self.context.get('request')
+                data['image'] = request.build_absolute_uri(url) if request else url
+            except Exception:
+                data['image'] = None
+        else:
+            data['image'] = None
+        return data
 
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
