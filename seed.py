@@ -184,20 +184,6 @@ def seed_database():
         )
         print("Sample approved prayer requests added.")
 
-    # 7. Seed default Gallery photos if empty
-    if not Gallery.objects.exists():
-        default_photos = [
-            ("gallery/church_sanctuary_bg.png", "Carmel Bible Church Sanctuary"),
-            ("gallery/Gemini_Generated_Image_51xyt951xyt951xy.png", "Sunday Worship Fellowship"),
-            ("gallery/WhatsApp_Image_2026-07-21_at_5.21.36_PM.jpeg", "Youth Gathering & Ministry"),
-        ]
-        for img_rel, cap in default_photos:
-            Gallery.objects.create(
-                image=img_rel,
-                caption=cap
-            )
-        print("Default Gallery photos seeded.")
-
     print("Database seeding completed successfully.")
 
 if __name__ == "__main__":
