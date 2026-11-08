@@ -162,6 +162,9 @@ class GallerySerializer(serializers.ModelSerializer):
         if instance.image:
             try:
                 url = instance.image.url
+                if 'res.cloudinary.com' in url and '/image/upload/' not in url:
+                    import re
+                    url = re.sub(r'res\.cloudinary\.com/([^/]+)/', r'res.cloudinary.com/\1/image/upload/', url)
                 request = self.context.get('request')
                 data['image'] = request.build_absolute_uri(url) if request else url
             except Exception:
